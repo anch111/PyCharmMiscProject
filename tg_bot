@@ -1,1 +1,541 @@
+from random import *
 
+n = int(input('Введите количество абитуриентов >>> '))
+data = []
+ids = []
+
+def program_choice():
+    global programs, p
+    f = randint(0, len(p) - 1)
+    programs.append(p[f])
+    p.pop(f)
+
+
+for i in range(n):
+    # Выдача идентификационного номера
+    id = randint(3_500_000, 5_500_000)
+    while id in ids:
+        id = randint(3_500_000, 5_500_000)
+
+    # Платная основа
+    if randint(0, 3) == 0:
+        basis = 'Платно'
+    elif randint(0, 10) == 0:
+        basis = 'Отдельная квота'
+    elif randint(0, 10) == 0:
+        basis = 'Особая квота'
+    else:
+        basis = 'Основные места в рамках КЦП'
+
+    # очно / очно-заочно / заочно
+    if choice([0, 0, 0, 0, 0, 0, 0, 1]) == 1: form = 'Заочно'
+    elif choice([0, 0, 0, 0, 0, 0, 0, 1]) == 1: form = 'Очно-заочно'
+    else: form = 'Очно'
+
+    # Наличие согласия
+    consent = choice([0, 0, 0, 1, 1])
+
+    # Баллы за вступительные испытания
+    es = choice([0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4])
+    ex_sc = 0
+    if es == 0:
+        ex_sc = randint(250, 300)
+    elif es == 1:
+        ex_sc = randint(200, 250)
+    elif es == 2:
+        ex_sc = randint(150, 200)
+    elif es == 3:
+        ex_sc = randint(100, 150)
+    elif es == 4:
+        ex_sc = randint(0, 100)
+
+    # Баллы за индивидуальные достижения
+    if choice([0, 1, 1]) == 1:
+        ind_ach = randint(1, 10)
+    else:
+        ind_ach = 0
+
+    # Сумма баллов
+    summ = ex_sc + ind_ach
+
+    # Выбор программ в порядке приоритета
+    programs_ = choice([1, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5])
+    p = ['Радиотехника', 'Программная Инженерия', 'Прикладная Информатика', 'Прикладной ИИ', 'Алгоритмы ИИ', 'Безопасность компьютерных систем', \
+         'Инфокоммуникационные технологии и системы связи', 'Конструирование и технология электронных средств', 'Технология полиграфического и упаковочного производства', \
+         'Управление в технических системах', 'Информатика и вычислительная техника']
+    programs = []
+
+    while len(programs) != programs_:
+        program_choice()
+
+    if (5 in programs) and (6 not in programs) and randint(1, 5) != 1: programs.append(6)
+    if (6 in programs) and (5 not in programs) and randint(1, 5) != 1: programs.append(5)
+
+    if (11 in programs) and (12 not in programs) and randint(1, 5) != 1: programs.append(12)
+    if (12 in programs) and (11 not in programs) and randint(1, 5) != 1: programs.append(11)
+
+    shuffle(programs)
+    ids.append(id)
+
+    # Добавление в базу данных
+    for j in programs:
+        data.append(list(map(str, [id, consent, basis, form, ex_sc, ind_ach, summ, j])))
+
+    # Дополнительные варианты для платной основы
+    if basis == 'Основные места в рамках КЦП':
+        if choice([0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Платно', form, ex_sc, ind_ach, summ, j])))
+
+    elif basis == 'Отдельная квота':
+        if choice([0, 1, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Основные места в рамках КЦП', form, ex_sc, ind_ach, summ, j])))
+        if choice([0, 0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Платно', form, ex_sc, ind_ach, summ, j])))
+
+    elif basis == 'Особая квота':
+        if choice([0, 1, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Основные места в рамках КЦП', form, ex_sc, ind_ach, summ, j])))
+        if choice([0, 0, 0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Платно', form, ex_sc, ind_ach, summ, j])))
+
+
+    # Дополнительные варианты для формы образования
+    elif basis == 'Заочно':
+        if choice([0, 0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, basis, 'Очно-заочно', ex_sc, ind_ach, summ, j])))
+        if choice([0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, basis, 'Очно', ex_sc, ind_ach, summ, j])))
+
+    elif basis == 'Очно-заочно':
+        if choice([0, 0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Заочно', form, ex_sc, ind_ach, summ, j])))
+        if choice([0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Очно', form, ex_sc, ind_ach, summ, j])))
+
+    elif basis == 'Очно':
+        if choice([0, 0, 0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Очно-заочно', form, ex_sc, ind_ach, summ, j])))
+        if choice([0, 0, 0, 1]) == 1:
+            for j in programs:
+                data.append(list(map(str, [id, consent, 'Заочно', form, ex_sc, ind_ach, summ, j])))
+
+    # Целевая квота
+    if randint(0, 24) == 0:
+        data.append(list(map(str, [id, consent, 'Целевая квота', 'Очно', ex_sc, ind_ach, summ, choice(programs)])))
+
+
+
+# # Вывод данных
+# print('\t'.join(data[0]))
+# for i in range(1, len(data)):
+#     if data[i-1][0] == data[i][0]:
+#         print('\t'.join(data[i]))
+#     else:
+#         print()
+#         print('\t'.join(data[i]))
+# # print((ids))
+
+f = data
+
+# Радиотехника
+proshel_radiotehnika_ochno_budjet = []
+proshel_radiotehnika_ochno_platno = []
+proshel_radiotehnika_ochno_otdelnaya_kvota = []
+proshel_radiotehnika_ochno_osnovnaya_kvota = []
+proshel_radiotehnika_zaochno = []
+
+# Программная Инженерия
+proshel_prog_inj_ochno_budjet = []
+proshel_prog_inj_ochno_platno = []
+proshel_prog_inj_ochno_otdelnaya_kvota = []
+proshel_prog_inj_ochno_osnovnaya_kvota = []
+
+# Прикладная Информатика
+proshel_p_inf_ochno_budjet = []
+proshel_p_inf_ochno_platno = []
+proshel_p_inf_ochno_otdelnaya_kvota = []
+proshel_p_inf_ochno_osnovnaya_kvota = []
+proshel_p_inf_zaochno = []
+proshel_p_inf_ochnozaochno = []
+
+# Прикладной ИИ
+proshel_pii_ochno_budjet = []
+proshel_pii_ochno_platno = []
+proshel_pii_ochno_otdelnaya_kvota = []
+proshel_pii_ochno_osnovnaya_kvota = []
+
+# Алгоримы ИИ
+proshel_aii_ochno_budjet = []
+proshel_aii_ochno_platno = []
+proshel_aii_ochno_osnovnaya_kvota = []
+proshel_aii_ochno_otdelnaya_kvota = []
+
+# Безопасность компьютерных систем
+proshel_bks_ochno_budjet = []
+proshel_bks_ochno_platno = []
+proshel_bks_ochno_osnovnaya_kvota = []
+proshel_bks_ochno_otdelnaya_kvota = []
+proshel_bks_ochnozaochno = []
+
+# Инфокоммуникационные технологии и системы связи
+proshel_itss_ochno_budjet = []
+proshel_itss_ochno_platno = []
+proshel_itss_ochno_osnovnaya_kvota = []
+proshel_itss_ochno_otdelnaya_kvota = []
+
+# Конструирование и технология электронных средств
+proshel_ktes_ochno_budjet = []
+proshel_ktes_ochno_platno = []
+proshel_ktes_ochno_otdelnaya_kvota = []
+proshel_ktes_ochno_osnovnaya_kvota = []
+
+# Технология полиграфического и упаковочного производства
+proshel_tpup_ochno_budjet = []
+proshel_tpup_ochno_platno = []
+proshel_tpup_ochno_otdelnaya_kvota = []
+proshel_tpup_ochno_osnovnaya_kvota = []
+
+# Управление в технических системах
+proshel_uts_ochno_budjet = []
+proshel_uts_ochno_platno = []
+proshel_uts_ochno_otdelnaya_kvota = []
+proshel_uts_ochno_osnovnaya_kvota = []
+
+# Информатика и вычислительная техника
+proshel_ivt_ochno_budjet = []
+proshel_ivt_ochno_platno = []
+proshel_ivt_ochno_otdelnaya_kvota = []
+proshel_ivt_ochno_osnovnaya_kvota = []
+proshel_ivt_zaochno = []
+
+ids = []
+
+for i in range(310, -1, -1):
+    for j in f:
+
+    # Радиотехника
+        # Очно бюджет
+        if j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Радиотехника' and len(proshel_radiotehnika_ochno_budjet) <= 32 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_radiotehnika_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Радиотехника' and len(proshel_radiotehnika_ochno_platno) <= 6 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_radiotehnika_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Радиотехника' and len(proshel_radiotehnika_ochno_otdelnaya_kvota) <= 4 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_radiotehnika_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Радиотехника' and len(proshel_radiotehnika_ochno_osnovnaya_kvota) <= 4 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_radiotehnika_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+        # Заочно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Заочно' and j[6] == str(i) \
+        and j[7] == 'Радиотехника' and len(proshel_radiotehnika_zaochno) <= 60 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_radiotehnika_zaochno.append([j[0], j[6]])
+
+
+    # Программная инженерия
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Программная инженерия' and len(proshel_prog_inj_ochno_budjet) <= 80 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_prog_inj_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Программная инженерия' and len(proshel_prog_inj_ochno_platno) <= 200 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_prog_inj_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Программная инженерия' and len(proshel_prog_inj_ochno_otdelnaya_kvota) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_prog_inj_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Программная инженерия' and len(proshel_prog_inj_ochno_osnovnaya_kvota) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_prog_inj_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+
+    # Прикладная информатика
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Прикладная информатика' and len(proshel_p_inf_ochno_budjet) <= 130 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_p_inf_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Прикладная информатика' and len(proshel_p_inf_ochno_platno) <= 160 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_p_inf_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Прикладная информатика' and len(proshel_p_inf_ochno_otdelnaya_kvota) <= 17 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_p_inf_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Прикладная информатика' and len(proshel_p_inf_ochno_osnovnaya_kvota) <= 17 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_p_inf_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+        # Заочно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Заочно' and j[6] == str(i) \
+        and j[7] == 'Прикладная информатика' and len(proshel_p_inf_zaochno) <= 90 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_p_inf_zaochno.append([j[0], j[6]])
+
+        # Очно-заочно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно-заочно' and j[6] == str(i) \
+        and j[7] == 'Прикладная информатика' and len(proshel_p_inf_ochnozaochno) <= 100 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_p_inf_ochnozaochno.append([j[0], j[6]])
+
+
+    # Прикладной ИИ
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Прикладной ИИ' and len(proshel_pii_ochno_budjet) <= 75 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_pii_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Прикладной ИИ' and len(proshel_pii_ochno_platno) <= 45 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_pii_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Прикладной ИИ' and len(proshel_pii_ochno_otdelnaya_kvota) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_pii_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Прикладной ИИ' and len(proshel_pii_ochno_osnovnaya_kvota) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_pii_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+
+    # Алгоритмы ИИ
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Алгоритмы ИИ' and len(proshel_aii_ochno_budjet) <= 80 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_aii_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Алгоритмы ИИ' and len(proshel_aii_ochno_platno) <= 80 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_aii_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Алгоритмы ИИ' and len(proshel_aii_ochno_otdelnaya_kvota) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_aii_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Алгоритмы ИИ' and len(proshel_aii_ochno_osnovnaya_kvota) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_aii_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+
+    # Безопасность компьютерных систем
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Безопасность компьютерных систем' and len(proshel_bks_ochno_budjet) <= 88 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_bks_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Безопасность компьютерных систем' and len(proshel_bks_ochno_platno) <= 75 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_bks_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Безопасность компьютерных систем' and len(proshel_bks_ochno_otdelnaya_kvota) <= 11 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_bks_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Безопасность компьютерных систем' and len(proshel_bks_ochno_osnovnaya_kvota) <= 11 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_bks_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+        # Очно-заочно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно-заочно' and j[6] == str(i) \
+        and j[7] == 'Безопасность компьютерных систем' and len(proshel_bks_ochnozaochno) <= 50 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_bks_ochnozaochno.append([j[0], j[6]])
+
+
+    # Инфокоммуникационные технологии и системы связи
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Инфокоммуникационные технологии и системы связи' and len(proshel_itss_ochno_budjet) <= 48 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_itss_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Инфокоммуникационные технологии и системы связи' and len(proshel_itss_ochno_platno) <= 10 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_itss_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Инфокоммуникационные технологии и системы связи' and len(proshel_itss_ochno_osnovnaya_kvota) <= 6 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_itss_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Инфокоммуникационные технологии и системы связи' and len(proshel_itss_ochno_otdelnaya_kvota) <= 6 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_itss_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+
+    # Конструирование и технология электронных средств
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Конструирование и технология электронных средств' and len(proshel_ktes_ochno_budjet) <= 58 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ktes_ochno_budjet.append([j[0], j[6]])
+
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Конструирование и технология электронных средств' and len(proshel_ktes_ochno_platno) <= 6 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ktes_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Конструирование и технология электронных средств' and len(proshel_ktes_ochno_otdelnaya_kvota) <= 8 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ktes_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Конструирование и технология электронных средств' and len(proshel_ktes_ochno_osnovnaya_kvota) <= 8 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ktes_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+
+    # Технология полиграфического и упаковочного производства
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Технология полиграфического и упаковочного производства' and len(proshel_tpup_ochno_budjet) <= 35 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_tpup_ochno_budjet.append([j[0], j[6]])
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Технология полиграфического и упаковочного производства' and len(proshel_tpup_ochno_platno) <= 20 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_tpup_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Технология полиграфического и упаковочного производства' and len(proshel_tpup_ochno_otdelnaya_kvota) <= 5 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_tpup_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Технология полиграфического и упаковочного производства' and len(proshel_tpup_ochno_osnovnaya_kvota) <= 5 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_tpup_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+
+    # Управление в технических системах
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Управление в технических системах' and len(proshel_uts_ochno_budjet) <= 40 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_uts_ochno_budjet.append([j[0], j[6]])
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Управление в технических системах' and len(proshel_uts_ochno_platno) <= 6 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_uts_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Управление в технических системах' and len(proshel_uts_ochno_otdelnaya_kvota) <= 5 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_uts_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Управление в технических системах' and len(proshel_uts_ochno_osnovnaya_kvota) <= 5 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_uts_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+
+    # Информатика и вычислительная техника
+        # Очно бюджет
+        elif j[1] == '1' and j[2] == 'Основные места в рамках КЦП' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Информатика и вычислительная техника' and len(proshel_ivt_ochno_budjet) <= 160 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ivt_ochno_budjet.append([j[0], j[6]])
+        # Очно платно
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Очно' and j[6] == str(i) \
+        and j[7] == 'Информатика и вычислительная техника' and len(proshel_ivt_ochno_platno) <= 125 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ivt_ochno_platno.append([j[0], j[6]])
+
+        # Очно отдельная квота
+        elif j[1] == '1' and j[2] == 'Отдельная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Информатика и вычислительная техника' and len(proshel_ivt_ochno_otdelnaya_kvota) <= 20 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ivt_ochno_otdelnaya_kvota.append([j[0], j[6]])
+
+        # Очно основная квота
+        elif j[1] == '1' and j[2] == 'Основная квота' and j[3] == 'Очно' and j[6] == str(i) and \
+        j[7] == 'Информатика и вычислительная техника' and len(proshel_ivt_ochno_osnovnaya_kvota) <= 20 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ivt_ochno_osnovnaya_kvota.append([j[0], j[6]])
+
+        # Заочно квота
+        elif j[1] == '1' and j[2] == 'Платно' and j[3] == 'Заочно' and j[6] == str(i) and \
+        j[7] == 'Информатика и вычислительная техника' and len(proshel_ivt_zaochno) <= 20 and j[0] not in ids:
+            ids.append(j[0])
+            proshel_ivt_zaochno.append([j[0], j[6]])
+
+
+# Вывод данных по ивт
+for i in range(len(proshel_ivt_ochno_budjet)):
+    print(i, proshel_ivt_ochno_budjet[i])
